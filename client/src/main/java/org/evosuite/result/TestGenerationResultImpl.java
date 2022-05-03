@@ -230,6 +230,10 @@ class TestGenerationResultImpl<T extends Chromosome<T>> implements TestGeneratio
         return testLineCoverage.get(name);
     }
 
+    public Set<String> getTestCaseKeySet() {
+        return testCases.keySet();
+    }
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();

@@ -20,12 +20,15 @@
 
 package org.evosuite;
 
+import com.google.gson.Gson;
 import org.apache.commons.cli.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.evosuite.classpath.ClassPathHacker;
 import org.evosuite.executionmode.*;
 import org.evosuite.junit.writer.TestSuiteWriterUtils;
+import org.evosuite.result.TestGenerationResult;
+import org.evosuite.result.TestGenerationResultImpl;
 import org.evosuite.runtime.sandbox.MSecurityManager;
 import org.evosuite.runtime.util.JavaExecCmdUtil;
 import org.evosuite.setup.InheritanceTree;
@@ -33,11 +36,14 @@ import org.evosuite.setup.InheritanceTreeGenerator;
 import org.evosuite.utils.LoggingUtils;
 import org.evosuite.utils.Randomness;
 import org.evosuite.utils.SpawnProcessKeepAliveChecker;
+import org.evosuite.utils.CompactReport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -332,8 +338,29 @@ public class EvoSuite {
                 return Continuous.execute(options, javaOpts, line);
             }
 
-            return TestGeneration.executeTestGeneration(options, javaOpts, line);
 
+            logger.info("TEST GENERATION START");
+            List<List<TestGenerationResult>> result = TestGeneration.executeTestGeneration(options, javaOpts, line);
+            logger.info("TEST GENERATION OVER");
+
+            if (line.hasOption("serializeResult")) {
+                String serializePath = line.getOptionValue("serializeResultPath");
+
+                logger.info("Serializing test generation report to " + serializePath);
+
+                TestGenerationResultImpl testGenerationResult = (TestGenerationResultImpl) result.get(0).get(0);
+
+                try (PrintWriter out = new PrintWriter(new FileWriter(serializePath))) {
+                    Gson gson = new Gson();
+                    CompactReport compactReport = new CompactReport(testGenerationResult);
+                    String jsonReport = gson.toJson(compactReport);
+                    out.write(jsonReport);
+                } catch (IOException e) {
+                    logger.error("Error writing file to output stream: " + e);
+                }
+            }
+
+            return result;
         } catch (ParseException exp) {
             // oops, something went wrong
             logger.error("Parsing failed.  Reason: " + exp.getMessage());

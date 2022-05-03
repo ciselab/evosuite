@@ -128,6 +128,10 @@ public class CommandLineParameters {
         parallel.setArgs(3);
         parallel.setArgName("n i x");
 
+        Option serializeResult = new Option("serializeResult", "Serialize test generation result object to a file. Requires -serializeResultPath.");
+        Option serializeResultPath = new Option("serializeResultPath", true,"Path to the file where the test generation result object will be serialized to.");
+
+
 
         @SuppressWarnings("static-access")
         Option property = OptionBuilder.withArgName("property=value").hasArgs(2).withValueSeparator().withDescription("use value for given property").create("D");
@@ -160,6 +164,9 @@ public class CommandLineParameters {
         options.addOption(heapDump);
         options.addOption(startedByCtg);
         options.addOption(parallel);
+
+        options.addOption(serializeResult);
+        options.addOption(serializeResultPath);
 
         return options;
     }
