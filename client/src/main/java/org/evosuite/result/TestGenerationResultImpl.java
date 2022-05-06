@@ -30,7 +30,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-class TestGenerationResultImpl<T extends Chromosome<T>> implements TestGenerationResult<T> {
+public class TestGenerationResultImpl<T extends Chromosome<T>> implements TestGenerationResult<T> {
 
     private static final long serialVersionUID = 1306033906557741929L;
 
