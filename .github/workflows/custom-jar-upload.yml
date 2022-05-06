@@ -15,7 +15,7 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
       - run: mvn package -e -B -DskipTests=true 
-      - run: mkdir masterjars && cp master/target/evosuite-master-*-SNAPSHOT.jar
+      - run: mkdir masterjars && cp master/target/evosuite-master-*-SNAPSHOT.jar masterjars
       - uses: actions/upload-artifact@v3
         with:
           name: Package
