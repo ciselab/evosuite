@@ -1,4 +1,4 @@
-
+---
 name: Upload custom evosuite jar
 
 on:
@@ -15,7 +15,7 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
-      - run: mvn package -e -B -DskipTests=true 
+      - run: mvn package -e -B -DskipTests=true
       - run: zip -j release master/target/evosuite-master-*-SNAPSHOT.jar
       - name: Create Release
         id: create_release
@@ -27,7 +27,7 @@ jobs:
           release_name: Release ${{ github.ref }}
           draft: false
           prerelease: false
-  - name: Upload Release Asset
+      - name: Upload Release Asset
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
         env:
