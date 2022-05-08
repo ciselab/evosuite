@@ -3,9 +3,8 @@ name: Upload custom evosuite jar
 
 on:
   push:
-    branches: [ thunderdome ]
-	tags:
-		- 'v*' # Only matches commits tagged with v*, i.e. v1.0, v20.15.10
+    branches:
+		- 'release/**'
 
 jobs:
   build:
