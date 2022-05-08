@@ -4,7 +4,7 @@ name: Upload custom evosuite jar
 on:
   push:
     branches:
-	- 'release/**'
+      - 'release/**'
 
 jobs:
   build:
