@@ -267,7 +267,6 @@ public class TestSuiteWriter implements Opcodes {
 
             FileIOUtils.writeFile(scaffoldingContent, file);
             generated.add(file);
-            content += scaffoldingContent;
         }
 
         writeCoveredGoalsFile();
