@@ -1184,7 +1184,7 @@ public class Properties {
     @Parameter(key = "show_progress", group = "Output", description = "Show progress bar on console")
     public static boolean SHOW_PROGRESS = true;
 
-    @Parameter(key = "serialize_result", group = "Output", description = "Serialize result of search to main process")
+    @Parameter(key = "serialize_result", group = "Output", description = "Serialize result of search to main process. Disables writing to TEST_DIR.")
     public static boolean SERIALIZE_RESULT = false;
 
     @Parameter(key = "new_statistics", group = "Output", description = "Use the new statistics backend on the master")

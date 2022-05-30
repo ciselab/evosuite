@@ -138,6 +138,7 @@ public class TestGenerationResultBuilder {
         result.setUncoveredMutants(uncoveredMutants);
         result.setExceptionMutants(exceptionMutants);
         result.setTestSuiteCode(code);
+        result.setTestScaffoldCode(scaffold);
         result.setGeneticAlgorithm((GeneticAlgorithm<T>) ga);
         result.setDSEAlgorithm(dse);
         for (Map.Entry<FitnessFunction<?>, Double> e : targetCoverages.entrySet()) {
@@ -147,6 +148,8 @@ public class TestGenerationResultBuilder {
     }
 
     private String code = "";
+
+    private String scaffold = "";
 
     private GeneticAlgorithm<?> ga = null;
 
@@ -226,6 +229,10 @@ public class TestGenerationResultBuilder {
 
     public void setTestSuiteCode(String code) {
         this.code = code;
+    }
+
+    public void setTestScaffoldCode(String scaffoldCode) {
+        this.scaffold = scaffoldCode;
     }
 
     public void setGeneticAlgorithm(GeneticAlgorithm<?> ga) {

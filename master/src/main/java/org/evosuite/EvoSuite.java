@@ -339,14 +339,12 @@ public class EvoSuite {
             }
 
 
-            logger.info("TEST GENERATION START");
             List<List<TestGenerationResult>> result = TestGeneration.executeTestGeneration(options, javaOpts, line);
-            logger.info("TEST GENERATION OVER");
 
             if (line.hasOption("serializeResult")) {
                 String serializePath = line.getOptionValue("serializeResultPath");
 
-                logger.info("Serializing test generation report to " + serializePath);
+                LoggingUtils.getEvoLogger().info("* Serializing test generation report to " + serializePath);
 
                 TestGenerationResultImpl testGenerationResult = (TestGenerationResultImpl) result.get(0).get(0);
 
@@ -358,6 +356,15 @@ public class EvoSuite {
                 } catch (IOException e) {
                     logger.error("Error writing file to output stream: " + e);
                 }
+
+                LoggingUtils.getEvoLogger().info("* Removing test dir");
+
+                try {
+                    FileUtils.deleteDirectory(new File(Properties.TEST_DIR));
+                } catch (IOException e) {
+                    logger.error(" Error removing evosuite test dir:  " + e);
+                }
+
             }
 
             return result;

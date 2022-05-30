@@ -68,6 +68,8 @@ public class TestGenerationResultImpl<T extends Chromosome<T>> implements TestGe
 
     private String testSuiteCode = "";
 
+    private String testScaffoldCode = "";
+
     private String targetClass = "";
 
     //private String targetCriterion = "";
@@ -192,6 +194,17 @@ public class TestGenerationResultImpl<T extends Chromosome<T>> implements TestGe
 
     public void setTestSuiteCode(String code) {
         this.testSuiteCode = code;
+    }
+
+    /**
+     * Test Suite scaffold code
+     */
+    public String getTestScaffoldCode() {
+        return testScaffoldCode;
+    }
+
+    public void setTestScaffoldCode(String testScaffoldCode) {
+        this.testScaffoldCode = testScaffoldCode;
     }
 
     /**
