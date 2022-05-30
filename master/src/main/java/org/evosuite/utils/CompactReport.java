@@ -11,19 +11,20 @@ import org.evosuite.result.TestGenerationResultImpl;
 public class CompactReport implements Serializable {
     public String UUT;
     public String testSuiteCode;
+    public String testScaffoldCode;
     public Set<Integer> allCoveredLines;
     public Set<Integer> allUncoveredLines;
     public Set<BranchInfo> allCoveredBranches;
     public Set<BranchInfo> allUncoveredBranches;
     public Set<MutationInfo> allCoveredMutation;
     public Set<MutationInfo> allUncoveredMutation;
-
     public HashMap<String, CompactTestCase> testCaseList;
 
     public CompactReport(TestGenerationResultImpl<?> testGenerationResult) {
         this.allCoveredLines = testGenerationResult.getCoveredLines();
         this.UUT = testGenerationResult.getClassUnderTest();
         this.testSuiteCode = testGenerationResult.getTestSuiteCode();
+        this.testScaffoldCode = testGenerationResult.getTestScaffoldCode();
         this.testCaseList = CompactTestCase.buildTestCaseList(testGenerationResult);
         this.allUncoveredLines = testGenerationResult.getUncoveredLines();
         this.allCoveredBranches = testGenerationResult.getCoveredBranches();

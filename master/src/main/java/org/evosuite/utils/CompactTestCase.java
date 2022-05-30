@@ -30,8 +30,7 @@ public class CompactTestCase implements Serializable {
 
         Set<String> keySet = testGenerationResult.getTestCaseKeySet();
 
-        for(String key: keySet){
-            TestCase testCase = testGenerationResult.getTestCase(key);
+        for (String key : keySet) {
             // see what is exposed by TestCase
             String testCode = testGenerationResult.getTestCode(key);
             Set<Integer> coveredLines = testGenerationResult.getCoveredLines(key);

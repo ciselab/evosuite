@@ -262,6 +262,9 @@ public class TestSuiteWriter implements Opcodes {
             File file = new File(dir + "/" + scaffoldingName + ".java");
             String scaffoldingContent = Scaffolding.getScaffoldingFileContent(name, results,
                     TestSuiteWriterUtils.hasAnySecurityException(results));
+
+            TestGenerationResultBuilder.getInstance().setTestScaffoldCode(scaffoldingContent);
+
             FileIOUtils.writeFile(scaffoldingContent, file);
             generated.add(file);
             content += scaffoldingContent;
