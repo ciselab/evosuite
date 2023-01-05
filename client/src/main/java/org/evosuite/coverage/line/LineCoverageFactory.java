@@ -19,8 +19,10 @@
  */
 package org.evosuite.coverage.line;
 
+import org.evosuite.Properties;
 import org.evosuite.TestGenerationContext;
 import org.evosuite.coverage.MethodNameMatcher;
+import org.evosuite.ga.metaheuristics.mosa.structural.SingleLineCoverageUtils;
 import org.evosuite.graphs.cfg.BytecodeInstruction;
 import org.evosuite.instrumentation.LinePool;
 import org.evosuite.testsuite.AbstractFitnessFactory;
@@ -28,9 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * <p>
@@ -78,23 +78,40 @@ public class LineCoverageFactory extends
 
         long start = System.currentTimeMillis();
 
-        for (String className : LinePool.getKnownClasses()) {
-            // Only lines in CUT
-            if (!isCUT(className))
-                continue;
+        if (SingleLineCoverageUtils.isSingleCoverageMode()){
+            // we only consider methods that can access the target line
+            Map<String,List<Integer>> targetLinesMap = SingleLineCoverageUtils.getTargetLines();
 
-            for (String methodName : LinePool.getKnownMethodsFor(className)) {
-                if (isEnumDefaultConstructor(className, methodName)) {
-                    continue;
+
+            for (Map.Entry<String,List<Integer>> targetLineEntry : targetLinesMap.entrySet()){
+                String methodName = targetLineEntry.getKey();
+                List<Integer> targetLines = targetLineEntry.getValue();
+
+                for (int line : targetLines){
+                    goals.add(new LineCoverageTestFitness(Properties.TARGET_CLASS, methodName, line));
                 }
-                if (!matcher.methodMatches(methodName)) {
-                    logger.info("Method {} does not match criteria. ", methodName);
+            }
+
+        }else {
+
+            for (String className : LinePool.getKnownClasses()) {
+                // Only lines in CUT
+                if (!isCUT(className))
                     continue;
-                }
-                Set<Integer> lines = LinePool.getLines(className, methodName);
-                for (Integer line : lines) {
-                    logger.info("Adding goal for method " + className + "." + methodName + ", Line " + line + ".");
-                    goals.add(new LineCoverageTestFitness(className, methodName, line));
+
+                for (String methodName : LinePool.getKnownMethodsFor(className)) {
+                    if (isEnumDefaultConstructor(className, methodName)) {
+                        continue;
+                    }
+                    if (!matcher.methodMatches(methodName)) {
+                        logger.info("Method {} does not match criteria. ", methodName);
+                        continue;
+                    }
+                    Set<Integer> lines = LinePool.getLines(className, methodName);
+                    for (Integer line : lines) {
+                        logger.info("Adding goal for method " + className + "." + methodName + ", Line " + line + ".");
+                        goals.add(new LineCoverageTestFitness(className, methodName, line));
+                    }
                 }
             }
         }
