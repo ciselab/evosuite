@@ -22,6 +22,7 @@ package org.evosuite.coverage.branch;
 import org.evosuite.Properties;
 import org.evosuite.TestGenerationContext;
 import org.evosuite.coverage.MethodNameMatcher;
+import org.evosuite.ga.metaheuristics.mosa.structural.SingleLineCoverageUtils;
 import org.evosuite.graphs.cfg.BytecodeInstruction;
 import org.evosuite.graphs.cfg.ControlDependency;
 import org.evosuite.setup.DependencyAnalysis;
@@ -31,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * <p>
@@ -67,7 +69,18 @@ public class BranchCoverageFactory extends
             // Branchless methods
             for (String method : BranchPool.getInstance(TestGenerationContext.getInstance().getClassLoaderForSUT()).getBranchlessMethods(className)) {
                 if (matcher.fullyQualifiedMethodMatches(method)) {
-                    goals.add(createRootBranchTestFitness(className, method));
+                    // First we check if we are in the single line coverage mode
+                    if (SingleLineCoverageUtils.isSingleCoverageMode()){
+                        // If yes, we should check if the method directly or indirectly invokes the method in which the target line is
+                        // If we cannot reach to the target line by calling this method, this root branch is not a search objective for us.
+                        BranchCoverageTestFitness rootBranchTestFitness = createRootBranchTestFitness(className, method);
+                        if (SingleLineCoverageUtils.isTargetRootBranch(rootBranchTestFitness)){
+                            goals.add(rootBranchTestFitness);
+                        }
+                    }else{
+                        // If no, we can add the goal without any condition as all the goals in the target class is important
+                        goals.add(createRootBranchTestFitness(className, method));
+                    }
                 }
             }
 
@@ -81,12 +94,30 @@ public class BranchCoverageFactory extends
                 for (Branch b : BranchPool.getInstance(TestGenerationContext.getInstance().getClassLoaderForSUT()).retrieveBranchesInMethod(className,
                         methodName)) {
                     if (!b.isInstrumented()) {
-                        goals.add(createBranchCoverageTestFitness(b, true));
-                        goals.add(createBranchCoverageTestFitness(b, false));
+                            BranchCoverageTestFitness trueBranch = createBranchCoverageTestFitness(b, true);
+                            BranchCoverageTestFitness falseBranch = createBranchCoverageTestFitness(b, false);
+                            // First, we check if we want to cover the whole class on only one target line
+                            if (SingleLineCoverageUtils.isSingleCoverageMode()){
+                                // In single line coverage mode, we should check whether covering the true and false branch targets lead to covering the given target line
+                                Set<BranchCoverageGoal> targetBranches = SingleLineCoverageUtils.getTargetBranchGoals();
+                                // Checking true branch coverage goal
+                                if (targetBranches.contains(trueBranch.getBranchGoal())){
+                                    goals.add(trueBranch);
+                                }
+                                // Checking false branch coverage goal
+                                if (targetBranches.contains(falseBranch.getBranchGoal())){
+                                    goals.add(falseBranch);
+                                }
+                            }else {
+                                // In the class coverage mode, both targets are important for us
+                                goals.add(trueBranch);
+                                goals.add(falseBranch);
+                            }
+                        }
                     }
                 }
             }
-        }
+
         goalComputationTime = System.currentTimeMillis() - start;
         return goals;
     }
