@@ -108,7 +108,7 @@ public class MultiCriteriaManager extends StructuralGoalManager implements Seria
         for (Criterion criterion : Properties.CRITERION) {
             switch (criterion) {
                 case BRANCH:
-                    break; // branches have been handled by getControlDepencies4Branches
+                    break; // branches have been handled by getControlDependencies4Branches
                 case EXCEPTION:
                     break; // exception coverage is handled by calculateFitness
                 case LINE:
@@ -209,7 +209,7 @@ public class MultiCriteriaManager extends StructuralGoalManager implements Seria
     }
 
     /**
-     * This methods derive the dependencies between {@link InputCoverageTestFitness} and branches.
+     * This method derive the dependencies between {@link InputCoverageTestFitness} and branches.
      * Therefore, it is used to update 'this.dependencies'
      */
     private void addDependencies4Input() {
