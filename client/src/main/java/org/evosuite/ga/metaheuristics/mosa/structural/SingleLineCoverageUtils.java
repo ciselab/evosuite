@@ -161,6 +161,9 @@ public class SingleLineCoverageUtils {
 
     // return the method in which the given target line is
     private static String getTargetMethod() {
+        if (!isSingleCoverageMode()){
+            return null;
+        }
         Set<String> knownMethods =  BytecodeInstructionPool.getInstance(TestGenerationContext.getInstance().getClassLoaderForSUT()).knownMethods(Properties.TARGET_CLASS);
 
         for (String method : knownMethods){
