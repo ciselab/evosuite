@@ -35,6 +35,7 @@ import org.evosuite.rmi.service.ClientState;
 import org.evosuite.statistics.RuntimeVariable;
 import org.evosuite.testcase.TestFitnessFunction;
 import org.evosuite.testcase.execution.ExecutionTracer;
+import org.evosuite.testcase.factories.JUnitTestCarvedChromosomeFactory;
 import org.evosuite.testcase.factories.RandomLengthTestFactory;
 import org.evosuite.testsuite.TestSuiteChromosome;
 import org.evosuite.utils.ArrayUtil;
@@ -63,10 +64,15 @@ public class MOSuiteStrategy extends TestGenerationStrategy {
 
         GeneticAlgorithm<TestSuiteChromosome> algorithm = algorithmFactory.getSearchAlgorithm();
 
-        // Override chromosome factory
-        // TODO handle this better by introducing generics
-        ChromosomeFactory<TestSuiteChromosome> factory =
-                new TestSuiteChromosomeFactoryMock(new RandomLengthTestFactory());
+        ChromosomeFactory<TestSuiteChromosome> factory;
+        if (Properties.SELECTED_JUNIT != null) {
+            factory = new TestSuiteChromosomeFactoryMock(new JUnitTestCarvedChromosomeFactory(
+                    new RandomLengthTestFactory()));
+        } else {
+            // Override chromosome factory
+            // TODO handle this better by introducing generics
+            factory = new TestSuiteChromosomeFactoryMock(new RandomLengthTestFactory());
+        }
         algorithm.setChromosomeFactory(factory);
 
         if (Properties.SERIALIZE_GA || Properties.CLIENT_ON_THREAD)
