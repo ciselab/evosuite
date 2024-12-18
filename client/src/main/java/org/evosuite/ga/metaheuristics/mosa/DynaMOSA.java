@@ -31,6 +31,10 @@ import org.evosuite.utils.LoggingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -145,33 +149,50 @@ public class DynaMOSA extends AbstractMOSA {
         // We are trying to optimize for multiple targets at the same time.
         this.goalsManager = new MultiCriteriaManager(this.fitnessFunctions);
 
-        LoggingUtils.getEvoLogger().info("* Initial Number of Goals in DynaMOSA = " +
-                this.goalsManager.getCurrentGoals().size() + " / " + this.getUncoveredGoals().size());
+        String csvFile = String.format("CoveredGoalsOverTime-%d-%d.csv", LocalDateTime.now().getHour(),LocalDateTime.now().getMinute());
 
-        logger.debug("Initial Number of Goals = " + this.goalsManager.getCurrentGoals().size());
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(csvFile))) {
 
-        if (this.population.isEmpty()) {
-            // Initialize the population by creating solutions at random.
-            this.initializePopulation();
-        }
+            LoggingUtils.getEvoLogger().info("* Initial Number of Goals in DynaMOSA = " +
+                    this.goalsManager.getCurrentGoals().size() + " / " + this.getUncoveredGoals().size());
 
-        // Compute the fitness for each population member, update the coverage information and the
-        // set of goals to cover. Finally, update the archive.
-        // this.calculateFitness(); // Not required, already done by this.initializePopulation();
+            logger.debug("Initial Number of Goals = " + this.goalsManager.getCurrentGoals().size());
 
-        // Calculate dominance ranks and crowding distance. This is required to decide which
-        // individuals should be used for mutation and crossover in the first iteration of the main
-        // search loop.
-        this.rankingFunction.computeRankingAssignment(this.population, this.goalsManager.getCurrentGoals());
-        for (int i = 0; i < this.rankingFunction.getNumberOfSubfronts(); i++) {
-            this.distance.fastEpsilonDominanceAssignment(this.rankingFunction.getSubfront(i), this.goalsManager.getCurrentGoals());
-        }
+            writer.append(String.format("0:%d,", this.goalsManager.getCoveredGoals().size()));
 
-        // Evolve the population generation by generation until all gaols have been covered or the
-        // search budget has been consumed.
-        while (!isFinished() && this.goalsManager.getUncoveredGoals().size() > 0) {
-            this.evolve();
-            this.notifyIteration();
+            if (this.population.isEmpty()) {
+                // Initialize the population by creating solutions at random.
+                this.initializePopulation();
+            }
+
+            // Compute the fitness for each population member, update the coverage information and the
+            // set of goals to cover. Finally, update the archive.
+            // this.calculateFitness(); // Not required, already done by this.initializePopulation();
+
+            // Calculate dominance ranks and crowding distance. This is required to decide which
+            // individuals should be used for mutation and crossover in the first iteration of the main
+            // search loop.
+            this.rankingFunction.computeRankingAssignment(this.population, this.goalsManager.getCurrentGoals());
+            for (int i = 0; i < this.rankingFunction.getNumberOfSubfronts(); i++) {
+                this.distance.fastEpsilonDominanceAssignment(this.rankingFunction.getSubfront(i), this.goalsManager.getCurrentGoals());
+            }
+
+            // Evolve the population generation by generation until all gaols have been covered or the
+            // search budget has been consumed.
+            int previousCovered = this.goalsManager.getCoveredGoals().size();
+            while (!isFinished() && this.goalsManager.getUncoveredGoals().size() > 0) {
+                int currentCovered = this.goalsManager.getCoveredGoals().size();
+                if (previousCovered != currentCovered) {
+                    writer.append(String.format("%d:%d,", this.getAge(), this.goalsManager.getCoveredGoals().size()));
+                    previousCovered = currentCovered;
+                }
+                this.evolve();
+                this.notifyIteration();
+            }
+            writer.append(String.format("%d:%d", this.getAge(), this.goalsManager.getCoveredGoals().size()));
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         this.notifySearchFinished();
