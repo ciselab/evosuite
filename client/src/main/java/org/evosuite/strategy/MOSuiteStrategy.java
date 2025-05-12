@@ -27,6 +27,7 @@ import org.evosuite.ga.ChromosomeFactory;
 import org.evosuite.ga.FitnessFunction;
 import org.evosuite.ga.TestSuiteChromosomeFactoryMock;
 import org.evosuite.ga.TestSuiteFitnessFunctionMock;
+import org.evosuite.ga.archive.Archive;
 import org.evosuite.ga.metaheuristics.GeneticAlgorithm;
 import org.evosuite.ga.stoppingconditions.MaxStatementsStoppingCondition;
 import org.evosuite.result.TestGenerationResultBuilder;
@@ -68,6 +69,7 @@ public class MOSuiteStrategy extends TestGenerationStrategy {
         if (Properties.SELECTED_JUNIT != null) {
             factory = new TestSuiteChromosomeFactoryMock(new JUnitTestCarvedChromosomeFactory(
                     new RandomLengthTestFactory()));
+            Archive.getArchiveInstance().reset();
         } else {
             // Override chromosome factory
             // TODO handle this better by introducing generics

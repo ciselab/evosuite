@@ -149,7 +149,7 @@ public class DynaMOSA extends AbstractMOSA {
         // We are trying to optimize for multiple targets at the same time.
         this.goalsManager = new MultiCriteriaManager(this.fitnessFunctions);
 
-        String csvFile = String.format("CoveredGoalsOverTime-%d-%d.csv", LocalDateTime.now().getHour(),LocalDateTime.now().getMinute());
+        String csvFile = "CoveredGoalsOverTime.csv";
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(csvFile))) {
 
