@@ -67,7 +67,7 @@ public class CoverageArchive extends Archive {
     public void addTarget(TestFitnessFunction target) {
         super.addTarget(target);
 
-        if (!this.uncovered.contains(target)) {
+        if (!this.uncovered.contains(target) && !this.covered.containsKey(target)) {
             logger.debug("Registering new target '" + target + "'");
             this.uncovered.add(target);
         }
