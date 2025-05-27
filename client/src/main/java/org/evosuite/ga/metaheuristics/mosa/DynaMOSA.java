@@ -149,16 +149,14 @@ public class DynaMOSA extends AbstractMOSA {
         // We are trying to optimize for multiple targets at the same time.
         this.goalsManager = new MultiCriteriaManager(this.fitnessFunctions);
 
-        String csvFile = "CoveredGoalsOverTime.csv";
-
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(csvFile))) {
+        ArrayList<String> goalsOverTime = new ArrayList<>();
 
             LoggingUtils.getEvoLogger().info("* Initial Number of Goals in DynaMOSA = " +
                     this.goalsManager.getCurrentGoals().size() + " / " + this.getUncoveredGoals().size());
 
             logger.debug("Initial Number of Goals = " + this.goalsManager.getCurrentGoals().size());
 
-            writer.append(String.format("0:%d,", this.goalsManager.getCoveredGoals().size()));
+            goalsOverTime.add(String.format("%d:%d,", System.currentTimeMillis(), this.goalsManager.getCoveredGoals().size()));
 
             if (this.population.isEmpty()) {
                 // Initialize the population by creating solutions at random.
@@ -183,17 +181,20 @@ public class DynaMOSA extends AbstractMOSA {
             while (!isFinished() && this.goalsManager.getUncoveredGoals().size() > 0) {
                 int currentCovered = this.goalsManager.getCoveredGoals().size();
                 if (previousCovered != currentCovered) {
-                    writer.append(String.format("%d:%d,", this.getAge(), this.goalsManager.getCoveredGoals().size()));
+                    goalsOverTime.add(String.format("%d:%d,", System.currentTimeMillis(), this.goalsManager.getCoveredGoals().size()));
                     previousCovered = currentCovered;
                 }
                 this.evolve();
                 this.notifyIteration();
             }
-            writer.append(String.format("%d:%d", this.getAge(), this.goalsManager.getCoveredGoals().size()));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            String csvFile = "CoveredGoalsOverTime.csv";
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(csvFile))) {
+                writer.append(String.format("%s:%d,", "TotalGoals", (this.goalsManager.getCoveredGoals().size() + this.goalsManager.getUncoveredGoals().size()) ));
+                writer.append(String.join("", goalsOverTime));
+                writer.append(String.format("%d:%d", System.currentTimeMillis(), this.goalsManager.getCoveredGoals().size()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
         this.notifySearchFinished();
     }
